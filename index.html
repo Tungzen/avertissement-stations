@@ -2,1758 +2,1682 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0,
-      maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Station Alerte">
-<meta name="theme-color" content="#111827">
-<title>Station Alerte V2</title>
+
+<title>Station Alerte</title>
+
 <style>
-/* =========================================================
-   BASE
-   ========================================================= */
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
 }
-html,
-body {
+
+html, body {
     margin: 0;
     padding: 0;
     width: 100%;
     min-height: 100%;
-    background: #111827;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #101114;
     color: white;
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Helvetica,
-        Arial,
-        sans-serif;
 }
+
 body {
-    padding-bottom: 30px;
+    padding: env(safe-area-inset-top) 15px env(safe-area-inset-bottom);
 }
+
 .container {
     width: 100%;
-    max-width: 650px;
-    margin: auto;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px 0 40px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 34px;
+    margin: 10px 0 5px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #aaa;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: #1b1d22;
+    border-radius: 18px;
     padding: 18px;
+    margin-bottom: 15px;
 }
-/* =========================================================
-   HEADER
-   ========================================================= */
-.header {
-    text-align: center;
-    padding: 10px 0 20px;
+
+.card h2 {
+    margin-top: 0;
+    font-size: 21px;
 }
-.header h1 {
-    margin: 0;
-    font-size: 30px;
-    font-weight: 800;
-}
-.header p {
-    margin: 6px 0 0;
-    color: #9ca3af;
-}
-/* =========================================================
-   STATUS
-   ========================================================= */
-.status-card {
-    background: #1f2937;
-    border-radius: 22px;
-    padding: 22px;
-    text-align: center;
-    margin-bottom: 18px;
-}
-.status-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 9px;
-}
-.status-light {
-    width: 18px;
-    height: 18px;
-    background: #6b7280;
-    border-radius: 50%;
-}
-.status-light.active {
-    background: #22c55e;
-    box-shadow:
-        0 0 10px #22c55e,
-        0 0 25px #22c55e;
-}
-.status-text {
-    font-size: 18px;
-    font-weight: 700;
-}
-/* =========================================================
-   BUTTONS
-   ========================================================= */
+
 button {
     width: 100%;
     border: none;
-    border-radius: 16px;
-    padding: 17px;
+    border-radius: 14px;
+    padding: 16px;
     font-size: 18px;
-    font-weight: 800;
-    color: white;
-    margin-top: 11px;
+    font-weight: 700;
+    margin-top: 10px;
     cursor: pointer;
 }
-.start {
-    background: #16a34a;
+
+#startButton {
+    background: #19c463;
+    color: white;
 }
-.stop {
-    background: #dc2626;
+
+#stopButton {
+    background: #d92d3a;
+    color: white;
 }
-.test {
-    background: #2563eb;
+
+.testButton {
+    background: #286cff;
+    color: white;
 }
-.secondary {
-    background: #374151;
+
+button:disabled {
+    opacity: 0.45;
 }
-button:active {
-    transform: scale(.98);
+
+.status {
+    text-align: center;
+    padding: 14px;
+    border-radius: 12px;
+    background: #272a31;
+    margin-bottom: 15px;
+    font-weight: 600;
 }
-/* =========================================================
-   TEXTE RECONNU
-   ========================================================= */
+
+.status.listening {
+    background: #123d28;
+    color: #65e99a;
+}
+
+.status.stopped {
+    color: #aaa;
+}
+
 .recognized {
-    background: #111827;
-    border-radius: 13px;
-    padding: 13px;
-    margin-top: 15px;
-    min-height: 48px;
-    color: #d1d5db;
-    font-size: 14px;
-    text-align: left;
+    background: #111216;
+    border-radius: 12px;
+    padding: 12px;
+    min-height: 55px;
+    color: #ddd;
+    font-size: 15px;
     word-break: break-word;
 }
-/* =========================================================
-   SECTIONS
-   ========================================================= */
-.section {
-    background: #1f2937;
-    border-radius: 22px;
-    padding: 18px;
-    margin-bottom: 18px;
-}
-.section h2 {
-    margin: 0 0 13px;
-    font-size: 20px;
-}
-/* =========================================================
-   RECHERCHE
-   ========================================================= */
-.search {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    outline: none;
-    border-radius: 13px;
-    background: #374151;
-    color: white;
-    font-size: 16px;
-    margin-bottom: 10px;
-}
-.search::placeholder {
-    color: #9ca3af;
-}
-/* =========================================================
-   STATIONS
-   ========================================================= */
+
 .station-list {
-    max-height: 390px;
+    max-height: 520px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
+
 .station {
     display: flex;
     align-items: center;
-    padding: 13px 7px;
-    border-bottom: 1px solid #374151;
+    gap: 12px;
+    padding: 12px 5px;
+    border-bottom: 1px solid #303239;
 }
+
+.station:last-child {
+    border-bottom: none;
+}
+
 .station input {
     width: 23px;
     height: 23px;
-    margin-right: 12px;
-    accent-color: #22c55e;
+    flex-shrink: 0;
 }
+
 .station-name {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
 }
+
 .station-line {
     display: block;
-    color: #9ca3af;
-    font-size: 12px;
+    font-size: 13px;
+    color: #999;
     margin-top: 3px;
 }
-/* =========================================================
-   OPTIONS
-   ========================================================= */
-.setting-row {
+
+.setting {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 13px 0;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #303239;
 }
-.setting-row label {
+
+.setting:last-child {
+    border-bottom: none;
+}
+
+.setting label {
     font-size: 16px;
 }
-.toggle {
+
+.switch {
     width: 52px;
     height: 30px;
     position: relative;
 }
-.toggle input {
+
+.switch input {
     display: none;
 }
+
 .slider {
     position: absolute;
     inset: 0;
-    background: #4b5563;
+    background: #555;
     border-radius: 30px;
+    transition: 0.2s;
 }
+
 .slider:before {
     content: "";
     position: absolute;
     width: 24px;
     height: 24px;
-    top: 3px;
     left: 3px;
+    top: 3px;
     background: white;
     border-radius: 50%;
-    transition: .2s;
+    transition: 0.2s;
 }
-.toggle input:checked + .slider {
-    background: #16a34a;
+
+.switch input:checked + .slider {
+    background: #19c463;
 }
-.toggle input:checked + .slider:before {
+
+.switch input:checked + .slider:before {
     transform: translateX(22px);
 }
-/* =========================================================
-   INFO
-   ========================================================= */
-.info {
-    color: #d1d5db;
-    font-size: 14px;
-    line-height: 1.55;
-}
-.warning {
-    margin-top: 12px;
-    padding: 14px;
-    border-radius: 13px;
-    background: #451a03;
-    color: #fed7aa;
-}
-/* =========================================================
-   ALERTE PLEIN ÉCRAN
-   ========================================================= */
+
+/* ALERTE PLEIN ÉCRAN */
+
 #fullScreenAlert {
     position: fixed;
+    z-index: 999999;
     inset: 0;
-    width: 100vw;
-    height: 100vh;
-    background:
-        radial-gradient(
-            circle at center,
-            #ef4444 0%,
-            #b91c1c 45%,
-            #7f1d1d 100%
-        );
-    z-index: 99999;
     display: none;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    flex-direction: column;
     text-align: center;
     padding: 25px;
-    animation: alertFlash .65s infinite alternate;
+    background:
+        radial-gradient(circle at center, #ff3030 0%, #d60000 45%, #720000 100%);
+    animation: alertFlash 0.7s infinite alternate;
 }
-#fullScreenAlert.show {
+
+#fullScreenAlert.active {
     display: flex;
 }
+
+#alertTitle {
+    font-size: clamp(30px, 7vw, 55px);
+    font-weight: 900;
+    margin-bottom: 20px;
+}
+
+#alertStation {
+    font-size: clamp(42px, 12vw, 85px);
+    line-height: 1.05;
+    font-weight: 1000;
+    text-transform: uppercase;
+    margin: 10px 0 25px;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.35);
+}
+
+#alertMessage {
+    font-size: clamp(20px, 5vw, 32px);
+    font-weight: 700;
+    margin-bottom: 35px;
+}
+
+#closeAlertButton {
+    width: auto;
+    min-width: 220px;
+    background: white;
+    color: #b00000;
+    font-size: 22px;
+    padding: 18px 35px;
+}
+
 @keyframes alertFlash {
     from {
         filter: brightness(1);
     }
     to {
-        filter: brightness(1.35);
+        filter: brightness(1.3);
     }
 }
-.alert-icon {
-    font-size: 80px;
-    margin-bottom: 15px;
+
+.small {
+    color: #888;
+    font-size: 13px;
+    line-height: 1.5;
 }
-.alert-small {
-    font-size: 25px;
-    font-weight: 800;
-    letter-spacing: 2px;
-}
-.alert-station {
-    font-size: clamp(42px, 12vw, 85px);
-    line-height: 1.05;
-    font-weight: 1000;
-    margin: 20px 0;
-    text-shadow:
-        0 4px 12px rgba(0,0,0,.4);
-    word-break: break-word;
-}
-.alert-message {
-    font-size: 23px;
-    font-weight: 700;
-}
-.alert-close {
-    width: min(420px, 90%);
-    background: white;
-    color: #991b1b;
-    font-size: 23px;
-    margin-top: 35px;
-    padding: 20px;
-}
-/* =========================================================
-   FOOTER
-   ========================================================= */
-.footer {
-    text-align: center;
-    color: #6b7280;
-    font-size: 12px;
+
+.count {
+    text-align: right;
+    color: #aaa;
+    font-size: 13px;
+    margin-bottom: 8px;
 }
 </style>
 </head>
+
 <body>
-<!-- =====================================================
-     ALERTE PLEIN ÉCRAN
-     ===================================================== -->
-<div id="fullScreenAlert">
-    <div class="alert-icon">
-        🚨
-    </div>
-    <div class="alert-small">
-        VOTRE STATION
-    </div>
-    <div id="alertStation"
-         class="alert-station">
-    </div>
-    <div class="alert-message">
-        Préparez-vous à descendre !
-    </div>
-    <button class="alert-close"
-            onclick="closeAlert()">
-        ✓ J'AI VU
-    </button>
-</div>
+
 <div class="container">
-    <!-- HEADER -->
-    <div class="header">
-        <h1>
-            🚇 Station Alerte
-        </h1>
-        <p>
-            Métro Montréal & REM
-        </p>
+
+    <h1>🚇 Station Alerte</h1>
+
+    <div class="subtitle">
+        Ne manquez plus votre station
     </div>
-    <!-- STATUS -->
-    <div class="status-card">
-        <div class="status-row">
-            <span id="statusLight"
-                  class="status-light">
-            </span>
-            <span id="statusText"
-                  class="status-text">
-                Écoute arrêtée
-            </span>
-        </div>
-        <button id="startButton"
-                class="start"
-                onclick="startListening()">
+
+    <div id="status" class="status stopped">
+        🔴 Écoute arrêtée
+    </div>
+
+    <div class="card">
+        <h2>🎙️ Contrôle</h2>
+
+        <button id="startButton">
             🎙️ DÉMARRER L'ÉCOUTE
         </button>
-        <button id="stopButton"
-                class="stop"
-                onclick="stopListening()"
-                style="display:none;">
-            ⏹️ ARRÊTER L'ÉCOUTE
+
+        <button id="stopButton" disabled>
+            ⛔ ARRÊTER L'ÉCOUTE
         </button>
-        <button class="test"
-                onclick="testAlert()">
-            🚨 TESTER L'ALERTE
-        </button>
-        <div id="recognized"
-             class="recognized">
-            En attente d'une annonce...
-        </div>
-    </div>
-    <!-- STATIONS -->
-    <div class="section">
-        <h2>
-            ⭐ Stations à surveiller
-        </h2>
-        <input
-            id="search"
-            class="search"
-            type="text"
-            placeholder="Rechercher une station..."
-            oninput="renderStations()">
-        <div id="stationList"
-             class="station-list">
-        </div>
-        <button class="secondary"
-                onclick="selectAll()">
-            ☑️ TOUT SÉLECTIONNER
-        </button>
-        <button class="secondary"
-                onclick="deselectAll()">
-            ⬜ TOUT DÉSÉLECTIONNER
+
+        <button class="testButton" onclick="testAlert()">
+            🔔 TESTER L'ALERTE
         </button>
     </div>
-    <!-- OPTIONS -->
-    <div class="section">
-        <h2>
-            ⚙️ Options
-        </h2>
-        <div class="setting-row">
-            <label>
-                🔊 Alarme sonore
-            </label>
-            <label class="toggle">
-                <input
-                    type="checkbox"
-                    id="soundEnabled"
-                    checked
-                    onchange="saveSettings()">
+
+    <div class="card">
+        <h2>📍 Mes stations</h2>
+
+        <div id="stationCount" class="count"></div>
+
+        <div id="stationList" class="station-list"></div>
+    </div>
+
+    <div class="card">
+        <h2>⚙️ Paramètres</h2>
+
+        <div class="setting">
+            <label>🔊 Son de l'alarme</label>
+
+            <label class="switch">
+                <input type="checkbox" id="soundToggle" checked>
                 <span class="slider"></span>
             </label>
         </div>
-        <div class="setting-row">
-            <label>
-                📳 Vibration
-            </label>
-            <label class="toggle">
-                <input
-                    type="checkbox"
-                    id="vibrationEnabled"
-                    checked
-                    onchange="saveSettings()">
+
+        <div class="setting">
+            <label>📳 Vibration</label>
+
+            <label class="switch">
+                <input type="checkbox" id="vibrationToggle" checked>
                 <span class="slider"></span>
             </label>
         </div>
-        <div class="setting-row">
-            <label>
-                🔄 Reprise automatique
-            </label>
-            <label class="toggle">
-                <input
-                    type="checkbox"
-                    id="autoRestart"
-                    checked
-                    onchange="saveSettings()">
+
+        <div class="setting">
+            <label>🔄 Redémarrage automatique</label>
+
+            <label class="switch">
+                <input type="checkbox" id="autoRestartToggle" checked>
                 <span class="slider"></span>
             </label>
         </div>
     </div>
-    <!-- INFO -->
-    <div class="section">
-        <h2>
-            ℹ️ Fonctionnement
-        </h2>
-        <div class="info">
-            <p>
-                L'application écoute les annonces grâce
-                au microphone et cherche le nom des
-                stations que vous avez sélectionnées.
-            </p>
-            <p>
-                La détection est volontairement tolérante
-                aux accents, aux espaces et à certaines
-                erreurs fréquentes de reconnaissance vocale.
-            </p>
-            <div class="warning">
-                ⚠️ Sur iPhone, gardez l'application ouverte
-                pendant le trajet et autorisez le microphone.
-            </div>
+
+    <div class="card">
+        <h2>🗣️ Dernière reconnaissance</h2>
+
+        <div id="recognized" class="recognized">
+            En attente...
         </div>
+
+        <p class="small">
+            L'application écoute les annonces et recherche automatiquement
+            les noms des stations sélectionnées.
+        </p>
     </div>
-    <div class="footer">
-        Station Alerte V2
-    </div>
+
 </div>
+
+
+<!-- ALERTE PLEIN ÉCRAN -->
+
+<div id="fullScreenAlert">
+
+    <div id="alertTitle">
+        🚨 PROCHAINE STATION 🚨
+    </div>
+
+    <div id="alertStation">
+        MONTMORENCY
+    </div>
+
+    <div id="alertMessage">
+        Préparez-vous à descendre !
+    </div>
+
+    <button id="closeAlertButton" onclick="closeAlert()">
+        J'AI VU
+    </button>
+
+</div>
+
+
 <script>
+
 /* =========================================================
-   LISTE DES STATIONS
+   BASE DE DONNÉES DES STATIONS
+   STM + REM
    ========================================================= */
+
 const stations = [
-    /* ---------------- MÉTRO ---------------- */
+
+    /* =========================
+       MÉTRO — LIGNE VERTE
+       ========================= */
+
     {
-        name:"Angrignon",
-        line:"Métro — Ligne verte",
-        aliases:["angrignon"]
+        name: "Angrignon",
+        line: "Métro — Ligne verte",
+        aliases: ["angrignon"]
     },
     {
-        name:"Atwater",
-        line:"Métro — Ligne verte",
-        aliases:["atwater","at water"]
+        name: "Monk",
+        line: "Métro — Ligne verte",
+        aliases: ["monk"]
     },
     {
-        name:"Beaudry",
-        line:"Métro — Ligne verte",
-        aliases:["beaudry"]
+        name: "Jolicoeur",
+        line: "Métro — Ligne verte",
+        aliases: ["jolicoeur", "joli coeur"]
     },
     {
-        name:"Berri-UQAM",
-        line:"Métro — Lignes verte, orange, jaune",
-        aliases:[
-            "berri uqam",
-            "berri",
-            "uqam",
-            "berri uquam"
-        ]
+        name: "Verdun",
+        line: "Métro — Ligne verte",
+        aliases: ["verdun"]
     },
     {
-        name:"Charlevoix",
-        line:"Métro — Ligne verte",
-        aliases:["charlevoix"]
+        name: "De l'Église",
+        line: "Métro — Ligne verte",
+        aliases: ["de l'église", "de leglise", "eglise"]
     },
     {
-        name:"Crémazie",
-        line:"Métro — Ligne orange",
-        aliases:[
-            "cremazie",
-            "crematie",
-            "cremazie station"
-        ]
+        name: "LaSalle",
+        line: "Métro — Ligne verte",
+        aliases: ["lasalle", "la salle"]
     },
     {
-        name:"De Castelnau",
-        line:"Métro — Ligne bleue",
-        aliases:[
-            "de castelnau",
-            "castelnau"
-        ]
+        name: "Charlevoix",
+        line: "Métro — Ligne verte",
+        aliases: ["charlevoix"]
     },
     {
-        name:"De la Concorde",
-        line:"Métro — Ligne orange",
-        aliases:[
-            "de la concorde",
-            "concorde"
-        ]
+        name: "Lionel-Groulx",
+        line: "Métro — Ligne verte",
+        aliases: ["lionel groulx", "lionel-groulx", "lionel"]
     },
     {
-        name:"De l'Église",
-        line:"Métro — Ligne verte",
-        aliases:[
-            "de l eglise",
-            "de leglise",
-            "eglise"
-        ]
+        name: "Atwater",
+        line: "Métro — Ligne verte",
+        aliases: ["atwater", "at water"]
     },
     {
-        name:"Du Collège",
-        line:"Métro — Ligne orange",
-        aliases:[
-            "du college",
-            "college"
-        ]
+        name: "Guy-Concordia",
+        line: "Métro — Ligne verte",
+        aliases: ["guy concordia", "guy-concordia", "guy"]
     },
     {
-        name:"D'Iberville",
-        line:"Métro — Ligne bleue",
-        aliases:[
-            "d iberville",
-            "diber ville",
-            "iberville"
-        ]
+        name: "Peel",
+        line: "Métro — Ligne verte",
+        aliases: ["peel"]
     },
     {
-        name:"Fabre",
-        line:"Métro — Ligne bleue",
-        aliases:["fabre"]
+        name: "McGill",
+        line: "Métro — Ligne verte",
+        aliases: ["mcgill", "mc gill"]
     },
     {
-        name:"Frontenac",
-        line:"Métro — Ligne verte",
-        aliases:["frontenac"]
+        name: "Place-des-Arts",
+        line: "Métro — Ligne verte",
+        aliases: ["place des arts", "place-des-arts"]
     },
     {
-        name:"Georges-Vanier",
-        line:"Métro — Ligne orange",
-        aliases:[
-            "georges vanier",
-            "george vanier",
-            "vanier"
-        ]
+        name: "Saint-Laurent",
+        line: "Métro — Ligne verte",
+        aliases: ["saint laurent", "st laurent"]
     },
     {
-        name:"Guy-Concordia",
-        line:"Métro — Ligne verte",
-        aliases:[
-            "guy concordia",
-            "guy",
-            "concordia"
-        ]
+        name: "Berri-UQAM",
+        line: "Métro — Ligne verte",
+        aliases: ["berri uqam", "berri", "uqam", "berri-uqam"]
     },
     {
-        name:"Henri-Bourassa",
-        line:"Métro — Ligne orange",
-        aliases:[
-            "henri bourassa",
-            "henri",
-            "bourassa"
-        ]
+        name: "Beaudry",
+        line: "Métro — Ligne verte",
+        aliases: ["beaudry"]
     },
     {
-        name:"Jarry",
-        line:"Métro — Ligne orange",
-        aliases:["jarry"]
+        name: "Papineau",
+        line: "Métro — Ligne verte",
+        aliases: ["papineau"]
     },
     {
-        name:"Jean-Drapeau",
-        line:"Métro — Ligne jaune",
-        aliases:[
-            "jean drapeau",
-            "jean drapeau"
-        ]
+        name: "Frontenac",
+        line: "Métro — Ligne verte",
+        aliases: ["frontenac"]
     },
     {
-        name:"Jean-Talon",
-        line:"Métro — Lignes orange et bleue",
-        aliases:[
-            "jean talon",
-            "jean talon"
-        ]
+        name: "Préfontaine",
+        line: "Métro — Ligne verte",
+        aliases: ["préfontaine", "prefontaine"]
     },
     {
-        name:"Jolicoeur",
-        line:"Métro — Ligne verte",
-        aliases:["jolicoeur"]
+        name: "Joliette",
+        line: "Métro — Ligne verte",
+        aliases: ["joliette"]
     },
     {
-        name:"LaSalle",
-        line:"Métro — Ligne verte",
-        aliases:[
-            "lasalle",
-            "la salle"
-        ]
+        name: "Pie-IX",
+        line: "Métro — Ligne verte",
+        aliases: ["pie neuf", "pie 9", "pie ix", "pie-ix"]
     },
     {
-        name:"Langelier",
-        line:"Métro — Ligne verte",
-        aliases:["langelier"]
+        name: "Viau",
+        line: "Métro — Ligne verte",
+        aliases: ["viau"]
     },
     {
-        name:"Laurier",
-        line:"Métro — Ligne orange",
-        aliases:["laurier"]
+        name: "Assomption",
+        line: "Métro — Ligne verte",
+        aliases: ["assomption"]
     },
     {
-        name:"Lionel-Groulx",
-        line:"Métro — Lignes verte et orange",
-        aliases:[
-            "lionel groulx",
-            "lionel",
-            "groulx"
-        ]
+        name: "Cadillac",
+        line: "Métro — Ligne verte",
+        aliases: ["cadillac"]
     },
     {
-        name:"Longueuil–Université-de-Sherbrooke",
-        line:"Métro — Ligne jaune",
-        aliases:[
+        name: "Langelier",
+        line: "Métro — Ligne verte",
+        aliases: ["langelier"]
+    },
+    {
+        name: "Radisson",
+        line: "Métro — Ligne verte",
+        aliases: ["radisson"]
+    },
+    {
+        name: "Honoré-Beaugrand",
+        line: "Métro — Ligne verte",
+        aliases: ["honoré beaugrand", "honore beaugrand", "honore", "beaugrand"]
+    },
+
+
+    /* =========================
+       MÉTRO — LIGNE ORANGE
+       ========================= */
+
+    {
+        name: "Côte-Vertu",
+        line: "Métro — Ligne orange",
+        aliases: ["côte vertu", "cote vertu", "côte-vertu"]
+    },
+    {
+        name: "Du Collège",
+        line: "Métro — Ligne orange",
+        aliases: ["du collège", "du college"]
+    },
+    {
+        name: "De la Savane",
+        line: "Métro — Ligne orange",
+        aliases: ["de la savane", "savane"]
+    },
+    {
+        name: "Namur",
+        line: "Métro — Ligne orange",
+        aliases: ["namur"]
+    },
+    {
+        name: "Plamondon",
+        line: "Métro — Ligne orange",
+        aliases: ["plamondon"]
+    },
+    {
+        name: "Côte-Sainte-Catherine",
+        line: "Métro — Ligne orange",
+        aliases: ["côte sainte catherine", "cote sainte catherine", "sainte catherine"]
+    },
+    {
+        name: "Snowdon",
+        line: "Métro — Ligne orange / bleue",
+        aliases: ["snowdon", "snow down"]
+    },
+    {
+        name: "Villa-Maria",
+        line: "Métro — Ligne orange",
+        aliases: ["villa maria", "villa-maria"]
+    },
+    {
+        name: "Vendôme",
+        line: "Métro — Ligne orange",
+        aliases: ["vendôme", "vendome"]
+    },
+    {
+        name: "Place-Saint-Henri",
+        line: "Métro — Ligne orange",
+        aliases: ["place saint henri", "saint henri"]
+    },
+    {
+        name: "Georges-Vanier",
+        line: "Métro — Ligne orange",
+        aliases: ["georges vanier", "georges-vanier", "vanier"]
+    },
+    {
+        name: "Lucien-L'Allier",
+        line: "Métro — Ligne orange",
+        aliases: ["lucien l'allier", "lucien lallier", "lucien"]
+    },
+    {
+        name: "Bonaventure",
+        line: "Métro — Ligne orange",
+        aliases: ["bonaventure"]
+    },
+    {
+        name: "Square-Victoria–OACI",
+        line: "Métro — Ligne orange",
+        aliases: ["square victoria", "square victoria oaci", "victoria oaci"]
+    },
+    {
+        name: "Place-d'Armes",
+        line: "Métro — Ligne orange",
+        aliases: ["place d'armes", "place darmes"]
+    },
+    {
+        name: "Champ-de-Mars",
+        line: "Métro — Ligne orange",
+        aliases: ["champ de mars", "champ-de-mars"]
+    },
+    {
+        name: "Sherbrooke",
+        line: "Métro — Ligne orange",
+        aliases: ["sherbrooke"]
+    },
+    {
+        name: "Mont-Royal",
+        line: "Métro — Ligne orange",
+        aliases: ["mont royal", "mont-royal"]
+    },
+    {
+        name: "Laurier",
+        line: "Métro — Ligne orange",
+        aliases: ["laurier"]
+    },
+    {
+        name: "Rosemont",
+        line: "Métro — Ligne orange",
+        aliases: ["rosemont"]
+    },
+    {
+        name: "Beaubien",
+        line: "Métro — Ligne orange",
+        aliases: ["beaubien"]
+    },
+    {
+        name: "Jean-Talon",
+        line: "Métro — Ligne orange / bleue",
+        aliases: ["jean talon", "jean-talon"]
+    },
+    {
+        name: "Jarry",
+        line: "Métro — Ligne orange",
+        aliases: ["jarry"]
+    },
+    {
+        name: "Crémazie",
+        line: "Métro — Ligne orange",
+        aliases: ["crémazie", "cremazie"]
+    },
+    {
+        name: "Sauvé",
+        line: "Métro — Ligne orange",
+        aliases: ["sauvé", "sauve"]
+    },
+    {
+        name: "Henri-Bourassa",
+        line: "Métro — Ligne orange",
+        aliases: ["henri bourassa", "henri-bourassa", "bourassa"]
+    },
+    {
+        name: "Cartier",
+        line: "Métro — Ligne orange",
+        aliases: ["cartier"]
+    },
+    {
+        name: "De la Concorde",
+        line: "Métro — Ligne orange",
+        aliases: ["de la concorde", "concorde"]
+    },
+    {
+        name: "Montmorency",
+        line: "Métro — Ligne orange",
+        aliases: ["montmorency"]
+    },
+
+
+    /* =========================
+       MÉTRO — LIGNE BLEUE
+       ========================= */
+
+    {
+        name: "Côte-des-Neiges",
+        line: "Métro — Ligne bleue",
+        aliases: ["côte des neiges", "cote des neiges"]
+    },
+    {
+        name: "Université-de-Montréal",
+        line: "Métro — Ligne bleue",
+        aliases: ["université de montréal", "universite de montreal", "université montréal"]
+    },
+    {
+        name: "Édouard-Montpetit",
+        line: "Métro — Ligne bleue",
+        aliases: ["édouard montpetit", "edouard montpetit", "montpetit"]
+    },
+    {
+        name: "Outremont",
+        line: "Métro — Ligne bleue",
+        aliases: ["outremont"]
+    },
+    {
+        name: "Acadie",
+        line: "Métro — Ligne bleue",
+        aliases: ["acadie"]
+    },
+    {
+        name: "Parc",
+        line: "Métro — Ligne bleue",
+        aliases: ["parc"]
+    },
+    {
+        name: "De Castelnau",
+        line: "Métro — Ligne bleue",
+        aliases: ["de castelnau", "castelnau"]
+    },
+    {
+        name: "Fabre",
+        line: "Métro — Ligne bleue",
+        aliases: ["fabre"]
+    },
+    {
+        name: "D'Iberville",
+        line: "Métro — Ligne bleue",
+        aliases: ["d'iberville", "diberville"]
+    },
+    {
+        name: "Saint-Michel",
+        line: "Métro — Ligne bleue",
+        aliases: ["saint michel", "st michel"]
+    },
+
+
+    /* =========================
+       MÉTRO — LIGNE JAUNE
+       ========================= */
+
+    {
+        name: "Jean-Drapeau",
+        line: "Métro — Ligne jaune",
+        aliases: ["jean drapeau", "jean-drapeau"]
+    },
+    {
+        name: "Longueuil–Université-de-Sherbrooke",
+        line: "Métro — Ligne jaune",
+        aliases: [
+            "longueuil université de sherbrooke",
+            "longueuil universite de sherbrooke",
             "longueuil",
-            "universite de sherbrooke",
-            "longueuil universite"
+            "université de sherbrooke"
         ]
     },
+
+
+    /* =========================
+       REM
+       ========================= */
+
     {
-        name:"McGill",
-        line:"Métro — Ligne verte",
-        aliases:[
-            "mcgill",
-            "mc gill"
-        ]
+        name: "Brossard",
+        line: "REM",
+        aliases: ["brossard"]
     },
     {
-        name:"Mont-Royal",
-        line:"Métro — Ligne orange",
-        aliases:[
-            "mont royal",
-            "montreal"
-        ]
+        name: "Du Quartier",
+        line: "REM",
+        aliases: ["du quartier", "quartier"]
     },
     {
-        name:"Namur",
-        line:"Métro — Ligne orange",
-        aliases:["namur"]
+        name: "Panama",
+        line: "REM",
+        aliases: ["panama"]
     },
     {
-        name:"Papineau",
-        line:"Métro — Ligne verte",
-        aliases:["papineau"]
+        name: "Île-des-Sœurs",
+        line: "REM",
+        aliases: ["île des soeurs", "ile des soeurs", "île des sœurs", "ile des sœurs"]
     },
     {
-        name:"Parc",
-        line:"Métro — Ligne bleue",
-        aliases:["parc"]
+        name: "Gare Centrale",
+        line: "REM",
+        aliases: ["gare centrale"]
     },
     {
-        name:"Peel",
-        line:"Métro — Ligne verte",
-        aliases:["peel"]
+        name: "McGill",
+        line: "REM",
+        aliases: ["mcgill", "mc gill"]
     },
     {
-        name:"Pie-IX",
-        line:"Métro — Ligne verte",
-        aliases:[
-            "pie ix",
-            "pie neuf",
-            "pie 9"
-        ]
+        name: "Édouard-Montpetit",
+        line: "REM",
+        aliases: ["édouard montpetit", "edouard montpetit", "montpetit"]
     },
     {
-        name:"Place-des-Arts",
-        line:"Métro — Ligne verte",
-        aliases:[
-            "place des arts",
-            "place des art"
-        ]
+        name: "Canora",
+        line: "REM",
+        aliases: ["canora"]
     },
     {
-        name:"Place-Saint-Henri",
-        line:"Métro — Ligne orange",
-        aliases:[
-            "place saint henri",
-            "saint henri"
-        ]
-    },
-    {
-        name:"Préfontaine",
-        line:"Métro — Ligne verte",
-        aliases:["prefontaine"]
-    },
-    {
-        name:"Radisson",
-        line:"Métro — Ligne verte",
-        aliases:["radisson"]
-    },
-    {
-        name:"Rosemont",
-        line:"Métro — Ligne orange",
-        aliases:["rosemont"]
-    },
-    {
-        name:"Sauvé",
-        line:"Métro — Ligne orange",
-        aliases:["sauve","sauvé"]
-    },
-    {
-        name:"Snowdon",
-        line:"Métro — Lignes orange et bleue",
-        aliases:["snowdon"]
-    },
-    {
-        name:"Square-Victoria–OACI",
-        line:"Métro — Ligne orange",
-        aliases:[
-            "square victoria",
-            "square victoria oaci",
-            "victoria"
-        ]
-    },
-    {
-        name:"Champ-de-Mars",
-        line:"Métro — Ligne orange",
-        aliases:[
-            "champ de mars",
-            "champdemars"
-        ]
-    },
-    {
-        name:"Côte-Sainte-Catherine",
-        line:"Métro — Ligne bleue",
-        aliases:[
-            "cote sainte catherine",
-            "sainte catherine"
-        ]
-    },
-    {
-        name:"Côte-des-Neiges",
-        line:"Métro — Ligne bleue",
-        aliases:[
-            "cote des neiges",
-            "cotes des neiges"
-        ]
-    },
-    {
-        name:"De la Savane",
-        line:"Métro — Ligne bleue",
-        aliases:[
-            "de la savane",
-            "savane"
-        ]
-    },
-    {
-        name:"Édouard-Montpetit",
-        line:"Métro — Ligne bleue",
-        aliases:[
-            "edouard montpetit",
-            "montpetit"
-        ]
-    },
-    {
-        name:"Joliette",
-        line:"Métro — Ligne verte",
-        aliases:["joliette"]
-    },
-    {
-        name:"Lucien-L'Allier",
-        line:"Métro — Ligne orange",
-        aliases:[
-            "lucien l allier",
-            "lucien lallier",
-            "lucien"
-        ]
-    },
-    {
-        name:"Montmorency",
-        line:"Métro — Ligne orange",
-        aliases:["montmorency"]
-    },
-    {
-        name:"Place-d'Armes",
-        line:"Métro — Ligne orange",
-        aliases:[
-            "place d armes",
-            "place darmes"
-        ]
-    },
-    {
-        name:"Université-de-Montréal",
-        line:"Métro — Ligne bleue",
-        aliases:[
-            "universite de montreal",
-            "université de montréal",
-            "udem"
-        ]
-    },
-    {
-        name:"Vendôme",
-        line:"Métro — Ligne orange",
-        aliases:[
-            "vendome",
-            "vendôme"
-        ]
-    },
-    {
-        name:"Viau",
-        line:"Métro — Ligne verte",
-        aliases:["viau"]
-    },
-    {
-        name:"Villa-Maria",
-        line:"Métro — Ligne orange",
-        aliases:[
-            "villa maria",
-            "villamaria"
-        ]
-    },
-    /* ---------------- REM ---------------- */
-    {
-        name:"Brossard",
-        line:"REM",
-        aliases:["brossard"]
-    },
-    {
-        name:"Du Quartier",
-        line:"REM",
-        aliases:[
-            "du quartier",
-            "quartier"
-        ]
-    },
-    {
-        name:"Panama",
-        line:"REM",
-        aliases:["panama"]
-    },
-    {
-        name:"Île-des-Sœurs",
-        line:"REM",
-        aliases:[
-            "ile des soeurs",
-            "ile des sœurs",
-            "iles des soeurs"
-        ]
-    },
-    {
-        name:"Griffintown–Bernard-Landry",
-        line:"REM",
-        aliases:[
-            "griffintown",
-            "bernard landry",
-            "griffin town"
-        ]
-    },
-    {
-        name:"Gare Centrale",
-        line:"REM",
-        aliases:[
-            "gare centrale",
-            "centrale"
-        ]
-    },
-    {
-        name:"McGill",
-        line:"REM",
-        aliases:[
-            "mcgill",
-            "mc gill"
-        ]
-    },
-    {
-        name:"Édouard-Montpetit",
-        line:"REM",
-        aliases:[
-            "edouard montpetit",
-            "montpetit"
-        ]
-    },
-    {
-        name:"Canora",
-        line:"REM",
-        aliases:["canora"]
-    },
-    {
-        name:"Mont-Royal",
-        line:"REM",
-        aliases:[
+        name: "Ville-de-Mont-Royal",
+        line: "REM",
+        aliases: [
+            "ville de mont royal",
+            "ville-de-mont-royal",
             "mont royal"
         ]
     },
     {
-        name:"Côte-de-Liesse",
-        line:"REM",
-        aliases:[
-            "cote de liesse",
-            "cote liesse",
-            "liesse"
+        name: "Côte-de-Liesse",
+        line: "REM",
+        aliases: ["côte de liesse", "cote de liesse"]
+    },
+    {
+        name: "Montpellier",
+        line: "REM",
+        aliases: ["montpellier"]
+    },
+    {
+        name: "Du Ruisseau",
+        line: "REM",
+        aliases: ["du ruisseau", "ruisseau"]
+    },
+    {
+        name: "Bois-Franc",
+        line: "REM",
+        aliases: ["bois franc", "bois-franc"]
+    },
+    {
+        name: "Sunnybrooke",
+        line: "REM",
+        aliases: ["sunnybrooke", "sunny brook"]
+    },
+    {
+        name: "Pierrefonds-Roxboro",
+        line: "REM",
+        aliases: ["pierrefonds roxboro", "pierrefonds", "roxboro"]
+    },
+    {
+        name: "Des Sources",
+        line: "REM",
+        aliases: ["des sources", "sources"]
+    },
+    {
+        name: "Fairview–Pointe-Claire",
+        line: "REM",
+        aliases: [
+            "fairview pointe claire",
+            "fairview",
+            "pointe claire",
+            "pointe-claire"
         ]
     },
     {
-        name:"Du Ruisseau",
-        line:"REM",
-        aliases:[
-            "du ruisseau",
-            "ruisseau"
+        name: "Kirkland",
+        line: "REM",
+        aliases: ["kirkland"]
+    },
+    {
+        name: "Anse-à-l'Orme",
+        line: "REM",
+        aliases: [
+            "anse à l'orme",
+            "anse a l'orme",
+            "anse à lorme",
+            "anse a lorme"
         ]
     },
     {
-        name:"Bois-Franc",
-        line:"REM",
-        aliases:[
-            "bois franc",
-            "boisfranc"
+        name: "Île-Bigras",
+        line: "REM",
+        aliases: ["île bigras", "ile bigras", "bigras"]
+    },
+    {
+        name: "Sainte-Dorothée",
+        line: "REM",
+        aliases: ["sainte dorothée", "sainte dorothee", "dorothée", "dorothee"]
+    },
+    {
+        name: "Grand-Moulin",
+        line: "REM",
+        aliases: ["grand moulin", "grand-moulin"]
+    },
+    {
+        name: "Deux-Montagnes",
+        line: "REM",
+        aliases: ["deux montagnes", "deux-montagnes"]
+    },
+
+    /*
+       Stations REM projetées / en construction
+       conservées dans la base pour permettre leur sélection
+    */
+
+    {
+        name: "Marie-Curie",
+        line: "REM — En construction",
+        aliases: ["marie curie", "marie-curie"]
+    },
+    {
+        name: "YUL-Aéroport-Montréal-Trudeau",
+        line: "REM — En construction",
+        aliases: [
+            "yul",
+            "aéroport montréal trudeau",
+            "aeroport montreal trudeau",
+            "aéroport trudeau",
+            "aeroport trudeau",
+            "trudeau"
         ]
     },
     {
-        name:"Cartier",
-        line:"REM",
-        aliases:["cartier"]
-    },
-    {
-        name:"De la Concorde",
-        line:"REM",
-        aliases:[
-            "de la concorde",
-            "concorde"
+        name: "Griffintown–Bernard-Landry",
+        line: "REM — Projetée",
+        aliases: [
+            "griffintown",
+            "bernard landry",
+            "griffintown bernard landry"
         ]
-    },
-    {
-        name:"Montmorency",
-        line:"REM",
-        aliases:["montmorency"]
     }
+
 ];
+
+
 /* =========================================================
    VARIABLES
    ========================================================= */
+
 let recognition = null;
 let listening = false;
-let restartTimer = null;
-let alertTimer = null;
-let lastDetected = "";
-let lastDetectionTime = 0;
-let audioContext = null;
+let selectedStations = [];
+
+let soundEnabled = true;
+let vibrationEnabled = true;
+let autoRestart = true;
+
+let lastTriggeredStation = "";
+let lastTriggerTime = 0;
+
+let alarmInterval = null;
+
+
 /* =========================================================
-   STATIONS SÉLECTIONNÉES
+   ÉLÉMENTS
    ========================================================= */
-let selectedStations =
-    JSON.parse(
-        localStorage.getItem(
-            "selectedStationsV2"
-        ) || "[]"
-    );
+
+const statusElement = document.getElementById("status");
+const recognizedElement = document.getElementById("recognized");
+const stationListElement = document.getElementById("stationList");
+const stationCountElement = document.getElementById("stationCount");
+
+const startButton = document.getElementById("startButton");
+const stopButton = document.getElementById("stopButton");
+
+const soundToggle = document.getElementById("soundToggle");
+const vibrationToggle = document.getElementById("vibrationToggle");
+const autoRestartToggle = document.getElementById("autoRestartToggle");
+
+
 /* =========================================================
-   NORMALISATION
+   CHARGEMENT DES PARAMÈTRES
    ========================================================= */
+
+try {
+    selectedStations =
+        JSON.parse(localStorage.getItem("selectedStationsV2")) || [];
+} catch (e) {
+    selectedStations = [];
+}
+
+soundEnabled =
+    localStorage.getItem("soundEnabledV2") !== "false";
+
+vibrationEnabled =
+    localStorage.getItem("vibrationEnabledV2") !== "false";
+
+autoRestart =
+    localStorage.getItem("autoRestartV2") !== "false";
+
+soundToggle.checked = soundEnabled;
+vibrationToggle.checked = vibrationEnabled;
+autoRestartToggle.checked = autoRestart;
+
+
+/* =========================================================
+   AFFICHAGE DES STATIONS
+   ========================================================= */
+
+function renderStations() {
+
+    stationListElement.innerHTML = "";
+
+    stations.forEach((station, index) => {
+
+        const div = document.createElement("div");
+        div.className = "station";
+
+        const checkbox = document.createElement("input");
+
+        checkbox.type = "checkbox";
+
+        checkbox.checked =
+            selectedStations.includes(index);
+
+        checkbox.addEventListener("change", function() {
+
+            if (this.checked) {
+
+                if (!selectedStations.includes(index)) {
+                    selectedStations.push(index);
+                }
+
+            } else {
+
+                selectedStations =
+                    selectedStations.filter(i => i !== index);
+
+            }
+
+            localStorage.setItem(
+                "selectedStationsV2",
+                JSON.stringify(selectedStations)
+            );
+
+            updateStationCount();
+        });
+
+        const text = document.createElement("div");
+
+        text.innerHTML = `
+            <div class="station-name">
+                ${station.name}
+            </div>
+            <span class="station-line">
+                ${station.line}
+            </span>
+        `;
+
+        div.appendChild(checkbox);
+        div.appendChild(text);
+
+        stationListElement.appendChild(div);
+    });
+
+    updateStationCount();
+}
+
+
+function updateStationCount() {
+
+    stationCountElement.textContent =
+        selectedStations.length +
+        " station" +
+        (selectedStations.length > 1 ? "s" : "") +
+        " sélectionnée" +
+        (selectedStations.length > 1 ? "s" : "");
+}
+
+
+/* =========================================================
+   NORMALISATION DU TEXTE
+   ========================================================= */
+
 function normalizeText(text) {
+
     return text
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[’'`]/g, " ")
-        .replace(/[–—-]/g, " ")
-        .replace(/[^\w\s]/g, " ")
+        .replace(/[’']/g, "")
+        .replace(/[-–—]/g, " ")
+        .replace(/[.,!?;:()[\]"]/g, " ")
         .replace(/\s+/g, " ")
         .trim();
 }
+
+
 /* =========================================================
-   AFFICHAGE STATIONS
+   INITIALISATION RECONNAISSANCE VOCALE
    ========================================================= */
-function renderStations() {
-    const list =
-        document.getElementById(
-            "stationList"
-        );
-    const search =
-        normalizeText(
-            document.getElementById(
-                "search"
-            ).value
-        );
-    list.innerHTML = "";
-    stations.forEach(
-        (station, index) => {
-            const searchable =
-                normalizeText(
-                    station.name +
-                    " " +
-                    station.line +
-                    " " +
-                    station.aliases.join(" ")
-                );
-            if (
-                search &&
-                !searchable.includes(search)
-            ) {
-                return;
-            }
-            const row =
-                document.createElement("div");
-            row.className =
-                "station";
-            const checkbox =
-                document.createElement("input");
-            checkbox.type =
-                "checkbox";
-            checkbox.checked =
-                selectedStations.includes(index);
-            checkbox.addEventListener(
-                "change",
-                function() {
-                    if (this.checked) {
-                        if (
-                            !selectedStations.includes(index)
-                        ) {
-                            selectedStations.push(index);
-                        }
-                    } else {
-                        selectedStations =
-                            selectedStations.filter(
-                                i => i !== index
-                            );
-                    }
-                    saveStations();
-                }
-            );
-            const label =
-                document.createElement("div");
-            label.className =
-                "station-name";
-            label.innerHTML =
-                station.name +
-                '<span class="station-line">' +
-                station.line +
-                '</span>';
-            row.appendChild(
-                checkbox
-            );
-            row.appendChild(
-                label
-            );
-            list.appendChild(
-                row
-            );
-        }
-    );
-}
-/* =========================================================
-   SAUVEGARDE STATIONS
-   ========================================================= */
-function saveStations() {
-    localStorage.setItem(
-        "selectedStationsV2",
-        JSON.stringify(
-            selectedStations
-        )
-    );
-}
-/* =========================================================
-   TOUT SÉLECTIONNER
-   ========================================================= */
-function selectAll() {
-    selectedStations =
-        stations.map(
-            (_, index) => index
-        );
-    saveStations();
-    renderStations();
-}
-/* =========================================================
-   TOUT DÉSÉLECTIONNER
-   ========================================================= */
-function deselectAll() {
-    selectedStations = [];
-    saveStations();
-    renderStations();
-}
-/* =========================================================
-   SETTINGS
-   ========================================================= */
-function saveSettings() {
-    localStorage.setItem(
-        "soundEnabledV2",
-        document.getElementById(
-            "soundEnabled"
-        ).checked
-    );
-    localStorage.setItem(
-        "vibrationEnabledV2",
-        document.getElementById(
-            "vibrationEnabled"
-        ).checked
-    );
-    localStorage.setItem(
-        "autoRestartV2",
-        document.getElementById(
-            "autoRestart"
-        ).checked
-    );
-}
-function loadSettings() {
-    const sound =
-        localStorage.getItem(
-            "soundEnabledV2"
-        );
-    const vibration =
-        localStorage.getItem(
-            "vibrationEnabledV2"
-        );
-    const restart =
-        localStorage.getItem(
-            "autoRestartV2"
-        );
-    if (sound !== null) {
-        document.getElementById(
-            "soundEnabled"
-        ).checked =
-            sound === "true";
-    }
-    if (vibration !== null) {
-        document.getElementById(
-            "vibrationEnabled"
-        ).checked =
-            vibration === "true";
-    }
-    if (restart !== null) {
-        document.getElementById(
-            "autoRestart"
-        ).checked =
-            restart === "true";
-    }
-}
-/* =========================================================
-   RECONNAISSANCE VOCALE
-   ========================================================= */
+
 function setupRecognition() {
+
     const SpeechRecognition =
         window.SpeechRecognition ||
         window.webkitSpeechRecognition;
+
     if (!SpeechRecognition) {
-        alert(
-            "La reconnaissance vocale n'est pas disponible " +
-            "dans ce navigateur. Essayez Safari sur iPhone."
-        );
+
+        statusElement.textContent =
+            "❌ Reconnaissance vocale non disponible";
+
+        startButton.disabled = true;
+
         return false;
     }
-    recognition =
-        new SpeechRecognition();
-    /*
-     * Français canadien
-     */
-    recognition.lang =
-        "fr-CA";
-    /*
-     * On demande une écoute continue.
-     */
-    recognition.continuous =
-        true;
-    /*
-     * Très important :
-     * les résultats intermédiaires permettent
-     * de détecter la station avant même que
-     * la phrase soit complètement terminée.
-     */
-    recognition.interimResults =
-        true;
-    /*
-     * Plusieurs alternatives permettent
-     * d'essayer différentes interprétations
-     * de la même phrase.
-     */
-    recognition.maxAlternatives =
-        10;
-    recognition.onstart =
-        function() {
-            listening = true;
-            updateStatus(
-                true,
-                "🎙️ ÉCOUTE ACTIVE"
-            );
-        };
-    recognition.onresult =
-        function(event) {
-            let fullText = "";
-            /*
-             * Analyse tous les nouveaux résultats.
-             */
+
+    recognition = new SpeechRecognition();
+
+    recognition.lang = "fr-CA";
+
+    recognition.continuous = true;
+
+    recognition.interimResults = true;
+
+    recognition.maxAlternatives = 10;
+
+
+    recognition.onstart = function() {
+
+        listening = true;
+
+        statusElement.textContent =
+            "🟢 Écoute active";
+
+        statusElement.className =
+            "status listening";
+
+        startButton.disabled = true;
+
+        stopButton.disabled = false;
+    };
+
+
+    recognition.onresult = function(event) {
+
+        let alternatives = [];
+
+        for (
+            let i = event.resultIndex;
+            i < event.results.length;
+            i++
+        ) {
+
+            const result = event.results[i];
+
             for (
-                let i = event.resultIndex;
-                i < event.results.length;
-                i++
+                let j = 0;
+                j < result.length;
+                j++
             ) {
-                const result =
-                    event.results[i];
-                /*
-                 * Analyse plusieurs alternatives
-                 */
-                for (
-                    let j = 0;
-                    j < result.length;
-                    j++
-                ) {
-                    const transcript =
-                        result[j].transcript;
-                    fullText +=
-                        transcript +
-                        " ";
-                    /*
-                     * Détection immédiate
-                     */
-                    detectStation(
-                        transcript
+
+                if (result[j].transcript) {
+
+                    alternatives.push(
+                        result[j].transcript
                     );
                 }
             }
-            document.getElementById(
-                "recognized"
-            ).textContent =
-                fullText.trim() ||
-                "Écoute en cours...";
-        };
-    recognition.onerror =
-        function(event) {
-            console.log(
-                "Speech error:",
-                event.error
-            );
-            if (
-                event.error ===
-                "not-allowed" ||
-                event.error ===
-                "service-not-allowed"
-            ) {
-                listening = false;
-                updateStatus(
-                    false,
-                    "Microphone refusé"
-                );
-                alert(
-                    "Le microphone n'est pas autorisé. " +
-                    "Vérifiez les réglages de Safari."
-                );
-            }
-        };
-    recognition.onend =
-        function() {
-            if (
-                listening &&
-                document.getElementById(
-                    "autoRestart"
-                ).checked
-            ) {
-                clearTimeout(
-                    restartTimer
-                );
-                /*
-                 * Relance rapidement l'écoute.
-                 */
-                restartTimer =
-                    setTimeout(
-                        function() {
-                            try {
-                                recognition.start();
-                            } catch(e) {
-                                console.log(e);
-                            }
-                        },
-                        250
-                    );
-            } else {
-                listening = false;
-                updateStatus(
-                    false,
-                    "Écoute arrêtée"
-                );
-            }
-        };
-    return true;
-}
-/* =========================================================
-   DÉMARRER
-   ========================================================= */
-function startListening() {
-    if (
-        selectedStations.length === 0
-    ) {
-        alert(
-            "Sélectionnez au moins une station."
-        );
-        return;
-    }
-    /*
-     * Création du contexte audio après
-     * une interaction utilisateur.
-     */
-    initAudio();
-    if (!recognition) {
-        if (!setupRecognition()) {
+        }
+
+        if (alternatives.length === 0) {
             return;
         }
-    }
-    try {
-        listening = true;
-        recognition.start();
-        document.getElementById(
-            "startButton"
-        ).style.display =
-            "none";
-        document.getElementById(
-            "stopButton"
-        ).style.display =
-            "block";
-    } catch(e) {
-        console.log(e);
-    }
+
+        const displayText =
+            alternatives[0];
+
+        recognizedElement.textContent =
+            displayText;
+
+        for (const transcript of alternatives) {
+
+            detectStation(transcript);
+        }
+    };
+
+
+    recognition.onerror = function(event) {
+
+        console.log(
+            "Erreur reconnaissance :",
+            event.error
+        );
+
+        if (event.error === "not-allowed" ||
+            event.error === "service-not-allowed") {
+
+            listening = false;
+
+            statusElement.textContent =
+                "❌ Microphone non autorisé";
+
+            statusElement.className =
+                "status stopped";
+
+            startButton.disabled = false;
+            stopButton.disabled = true;
+        }
+    };
+
+
+    recognition.onend = function() {
+
+        if (
+            listening &&
+            autoRestart
+        ) {
+
+            setTimeout(function() {
+
+                try {
+
+                    recognition.start();
+
+                } catch (e) {
+
+                    console.log(
+                        "Redémarrage impossible",
+                        e
+                    );
+                }
+
+            }, 250);
+
+        } else {
+
+            listening = false;
+
+            statusElement.textContent =
+                "🔴 Écoute arrêtée";
+
+            statusElement.className =
+                "status stopped";
+
+            startButton.disabled = false;
+            stopButton.disabled = true;
+        }
+    };
+
+    return true;
 }
+
+
 /* =========================================================
-   ARRÊTER
+   DÉTECTION DES STATIONS
    ========================================================= */
-function stopListening() {
-    listening = false;
-    clearTimeout(
-        restartTimer
-    );
-    if (recognition) {
-        try {
-            recognition.stop();
-        } catch(e) {}
-    }
-    document.getElementById(
-        "startButton"
-    ).style.display =
-        "block";
-    document.getElementById(
-        "stopButton"
-    ).style.display =
-        "none";
-    updateStatus(
-        false,
-        "Écoute arrêtée"
-    );
-}
-/* =========================================================
-   STATUS
-   ========================================================= */
-function updateStatus(
-    active,
-    text
-) {
-    const light =
-        document.getElementById(
-            "statusLight"
-        );
-    const status =
-        document.getElementById(
-            "statusText"
-        );
-    if (active) {
-        light.classList.add(
-            "active"
-        );
-    } else {
-        light.classList.remove(
-            "active"
-        );
-    }
-    status.textContent =
-        text;
-}
-/* =========================================================
-   DÉTECTION INTELLIGENTE
-   ========================================================= */
-function detectStation(
-    originalText
-) {
-    if (!originalText) {
-        return;
-    }
+
+function detectStation(originalText) {
+
     const text =
-        normalizeText(
-            originalText
-        );
+        normalizeText(originalText);
+
     if (!text) {
         return;
     }
-    /*
-     * On parcourt uniquement
-     * les stations sélectionnées.
-     */
-    for (
-        const index of selectedStations
-    ) {
+
+    for (const index of selectedStations) {
+
         const station =
             stations[index];
+
         if (!station) {
             continue;
         }
-        /*
-         * On crée une liste de variantes.
-         */
-        let variants = [
+
+        const variants = [
             station.name,
-            ...station.aliases
+            ...(station.aliases || [])
         ];
-        /*
-         * Analyse chaque variante.
-         */
-        for (
-            const variant of variants
-        ) {
+
+        for (const variant of variants) {
+
             const normalizedVariant =
-                normalizeText(
-                    variant
-                );
-            if (
-                normalizedVariant.length < 3
-            ) {
+                normalizeText(variant);
+
+            if (!normalizedVariant) {
                 continue;
             }
-            /*
-             * Méthode 1 :
-             * correspondance exacte dans la phrase.
-             */
+
+
+            /* Correspondance directe */
+
             if (
                 text.includes(
                     normalizedVariant
                 )
             ) {
-                triggerStation(
-                    station
-                );
+
+                triggerStation(station);
+
                 return;
             }
-            /*
-             * Méthode 2 :
-             * comparaison mot par mot.
-             *
-             * Utile lorsque le moteur écrit
-             * par exemple "mont royal"
-             * au lieu de "Mont-Royal".
-             */
-            const variantWords =
-                normalizedVariant.split(" ");
+
+
+            /* Correspondance mot par mot */
+
+            const words =
+                normalizedVariant
+                    .split(" ")
+                    .filter(Boolean);
+
             if (
-                variantWords.length > 1
+                words.length > 1 &&
+                words.every(word =>
+                    text.includes(word)
+                )
             ) {
-                let matches = 0;
-                for (
-                    const word of variantWords
-                ) {
-                    if (
-                        word.length >= 3 &&
-                        text.includes(word)
-                    ) {
-                        matches++;
-                    }
-                }
-                /*
-                 * Tous les mots importants
-                 * doivent être présents.
-                 */
-                if (
-                    matches ===
-                    variantWords.length
-                ) {
-                    triggerStation(
-                        station
-                    );
-                    return;
-                }
+
+                triggerStation(station);
+
+                return;
             }
         }
     }
 }
+
+
 /* =========================================================
-   STATION DÉTECTÉE
+   DÉCLENCHEMENT DE L'ALERTE
    ========================================================= */
-function triggerStation(
-    station
-) {
-    const now =
-        Date.now();
+
+function triggerStation(station) {
+
+    const now = Date.now();
+
     /*
-     * Protection contre les répétitions
-     * de la même annonce.
-     *
-     * 20 secondes.
-     */
+       Évite que la même station déclenche
+       plusieurs alertes pendant 20 secondes.
+    */
+
     if (
-        lastDetected ===
-            station.name &&
-        now -
-            lastDetectionTime <
-            20000
+        station.name === lastTriggeredStation &&
+        now - lastTriggerTime < 20000
     ) {
+
         return;
     }
-    lastDetected =
+
+    lastTriggeredStation =
         station.name;
-    lastDetectionTime =
+
+    lastTriggerTime =
         now;
+
     showFullScreenAlert(
         station.name
     );
 }
+
+
 /* =========================================================
    ALERTE PLEIN ÉCRAN
    ========================================================= */
-function showFullScreenAlert(
-    stationName
-) {
+
+function showFullScreenAlert(stationName) {
+
     const alert =
         document.getElementById(
             "fullScreenAlert"
         );
-    document.getElementById(
-        "alertStation"
-    ).textContent =
-        stationName;
-    alert.classList.add(
-        "show"
-    );
-    /*
-     * Vibration
-     */
-    if (
+
+    const station =
         document.getElementById(
-            "vibrationEnabled"
-        ).checked
-    ) {
-        vibrateAlert();
-    }
-    /*
-     * Son
-     */
-    if (
-        document.getElementById(
-            "soundEnabled"
-        ).checked
-    ) {
-        playAlarm();
-    }
-    /*
-     * Répète le son plusieurs fois.
-     */
-    clearInterval(
-        alertTimer
-    );
-    let count = 0;
-    alertTimer =
-        setInterval(
-            function() {
-                if (
-                    !document.getElementById(
-                        "fullScreenAlert"
-                    ).classList.contains(
-                        "show"
-                    )
-                ) {
-                    clearInterval(
-                        alertTimer
-                    );
-                    return;
-                }
-                if (
-                    count >= 5
-                ) {
-                    clearInterval(
-                        alertTimer
-                    );
-                    return;
-                }
-                if (
-                    document.getElementById(
-                        "soundEnabled"
-                    ).checked
-                ) {
-                    playAlarm();
-                }
-                count++;
-            },
-            1500
+            "alertStation"
         );
-}
-/* =========================================================
-   FERMER ALERTE
-   ========================================================= */
-function closeAlert() {
-    document.getElementById(
-        "fullScreenAlert"
-    ).classList.remove(
-        "show"
-    );
-    clearInterval(
-        alertTimer
-    );
-}
-/* =========================================================
-   VIBRATION
-   ========================================================= */
-function vibrateAlert() {
+
+    station.textContent =
+        stationName;
+
+    alert.classList.add("active");
+
+
+    /* VIBRATION */
+
     if (
-        "vibrate" in navigator
+        vibrationEnabled &&
+        navigator.vibrate
     ) {
+
         navigator.vibrate([
-            800,
+            500,
             200,
-            800,
+            500,
             200,
-            1000,
-            300,
-            1000
+            800
         ]);
     }
+
+
+    /* SON */
+
+    if (soundEnabled) {
+
+        playAlarm();
+
+        let repetitions = 0;
+
+        clearInterval(alarmInterval);
+
+        alarmInterval =
+            setInterval(function() {
+
+                repetitions++;
+
+                if (repetitions >= 5) {
+
+                    clearInterval(
+                        alarmInterval
+                    );
+
+                    return;
+                }
+
+                playAlarm();
+
+            }, 1500);
+    }
 }
+
+
 /* =========================================================
-   AUDIO
+   FERMETURE ALERTE
    ========================================================= */
-function initAudio() {
+
+function closeAlert() {
+
+    const alert =
+        document.getElementById(
+            "fullScreenAlert"
+        );
+
+    alert.classList.remove("active");
+
+    clearInterval(alarmInterval);
+
+    alarmInterval = null;
+
+    if (navigator.vibrate) {
+        navigator.vibrate(0);
+    }
+}
+
+
+/* =========================================================
+   ALARME AUDIO
+   ========================================================= */
+
+function playAlarm() {
+
     try {
+
         const AudioContext =
             window.AudioContext ||
             window.webkitAudioContext;
+
         if (!AudioContext) {
             return;
         }
-        if (!audioContext) {
-            audioContext =
-                new AudioContext();
-        }
-        if (
-            audioContext.state ===
-            "suspended"
-        ) {
-            audioContext.resume();
-        }
-    } catch(e) {
-        console.log(e);
-    }
-}
-/* =========================================================
-   ALARME SONORE
-   ========================================================= */
-function playAlarm() {
-    try {
-        initAudio();
-        if (!audioContext) {
-            return;
-        }
+
+        const audioContext =
+            new AudioContext();
+
         const oscillator =
             audioContext.createOscillator();
+
         const gain =
             audioContext.createGain();
+
         oscillator.type =
             "square";
-        oscillator.frequency.value =
-            900;
-        gain.gain.setValueAtTime(
-            0.001,
+
+        oscillator.frequency.setValueAtTime(
+            900,
             audioContext.currentTime
         );
+
+        oscillator.frequency.linearRampToValueAtTime(
+            1250,
+            audioContext.currentTime + 0.18
+        );
+
+        gain.gain.setValueAtTime(
+            0.0001,
+            audioContext.currentTime
+        );
+
         gain.gain.exponentialRampToValueAtTime(
-            0.5,
+            0.35,
             audioContext.currentTime + 0.02
         );
-        oscillator.connect(
-            gain
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.0001,
+            audioContext.currentTime + 0.45
         );
+
+        oscillator.connect(gain);
+
         gain.connect(
             audioContext.destination
         );
+
         oscillator.start();
-        setTimeout(
-            function() {
-                oscillator.frequency.value =
-                    1250;
-            },
-            180
+
+        oscillator.stop(
+            audioContext.currentTime + 0.45
         );
-        setTimeout(
-            function() {
-                try {
-                    oscillator.stop();
-                } catch(e) {}
-            },
-            450
-        );
-    } catch(e) {
+
+    } catch (e) {
+
         console.log(
-            "Audio:",
+            "Audio impossible",
             e
         );
     }
 }
+
+
 /* =========================================================
-   TEST ALERTE
+   DÉMARRER
    ========================================================= */
+
+function startListening() {
+
+    if (!recognition) {
+
+        if (!setupRecognition()) {
+            return;
+        }
+    }
+
+    if (selectedStations.length === 0) {
+
+        alert(
+            "Sélectionnez au moins une station avant de démarrer l'écoute."
+        );
+
+        return;
+    }
+
+    listening = true;
+
+    try {
+
+        recognition.start();
+
+    } catch (e) {
+
+        console.log(
+            "Déjà démarré ou erreur :",
+            e
+        );
+    }
+}
+
+
+/* =========================================================
+   ARRÊTER
+   ========================================================= */
+
+function stopListening() {
+
+    listening = false;
+
+    if (recognition) {
+
+        try {
+
+            recognition.stop();
+
+        } catch (e) {
+
+            console.log(e);
+        }
+    }
+
+    statusElement.textContent =
+        "🔴 Écoute arrêtée";
+
+    statusElement.className =
+        "status stopped";
+
+    startButton.disabled = false;
+
+    stopButton.disabled = true;
+}
+
+
+/* =========================================================
+   TEST
+   ========================================================= */
+
 function testAlert() {
-    initAudio();
+
     showFullScreenAlert(
         "TEST — MONTMORENCY"
     );
 }
+
+
+/* =========================================================
+   PARAMÈTRES
+   ========================================================= */
+
+soundToggle.addEventListener(
+    "change",
+    function() {
+
+        soundEnabled =
+            this.checked;
+
+        localStorage.setItem(
+            "soundEnabledV2",
+            soundEnabled
+        );
+    }
+);
+
+
+vibrationToggle.addEventListener(
+    "change",
+    function() {
+
+        vibrationEnabled =
+            this.checked;
+
+        localStorage.setItem(
+            "vibrationEnabledV2",
+            vibrationEnabled
+        );
+    }
+);
+
+
+autoRestartToggle.addEventListener(
+    "change",
+    function() {
+
+        autoRestart =
+            this.checked;
+
+        localStorage.setItem(
+            "autoRestartV2",
+            autoRestart
+        );
+    }
+);
+
+
+/* =========================================================
+   BOUTONS
+   ========================================================= */
+
+startButton.addEventListener(
+    "click",
+    startListening
+);
+
+stopButton.addEventListener(
+    "click",
+    stopListening
+);
+
+
 /* =========================================================
    INITIALISATION
    ========================================================= */
-loadSettings();
+
 renderStations();
+
+setupRecognition();
+
 </script>
+
 </body>
 </html>
