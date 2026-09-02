@@ -176,9 +176,8 @@ button:disabled {
     position: relative;
 }
 
-.switch input {
-    display: none;
-}
+.switch input { opacity: 0; width: 1px; height: 1px; position: absolute; }
+.switch input:focus-visible + .slider, button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 
 .slider {
     position: absolute;
@@ -328,7 +327,7 @@ button:disabled {
             <label>🔊 Son de l'alarme</label>
 
             <label class="switch">
-                <input type="checkbox" id="soundToggle" checked>
+                <input type="checkbox" id="soundToggle" checked aria-label="Activer le son de l'alarme">
                 <span class="slider"></span>
             </label>
         </div>
@@ -337,7 +336,7 @@ button:disabled {
             <label>📳 Vibration</label>
 
             <label class="switch">
-                <input type="checkbox" id="vibrationToggle" checked>
+                <input type="checkbox" id="vibrationToggle" checked aria-label="Activer la vibration">
                 <span class="slider"></span>
             </label>
         </div>
@@ -346,7 +345,7 @@ button:disabled {
             <label>🔄 Redémarrage automatique</label>
 
             <label class="switch">
-                <input type="checkbox" id="autoRestartToggle" checked>
+                <input type="checkbox" id="autoRestartToggle" checked aria-label="Activer le redémarrage automatique">
                 <span class="slider"></span>
             </label>
         </div>
@@ -370,7 +369,7 @@ button:disabled {
 
 <!-- ALERTE PLEIN ÉCRAN -->
 
-<div id="fullScreenAlert">
+<div id="fullScreenAlert" role="alertdialog" aria-modal="true" aria-labelledby="alertTitle alertStation" aria-describedby="alertMessage">
 
     <div id="alertTitle">
         🚨 PROCHAINE STATION 🚨
@@ -476,8 +475,8 @@ const stations = [
     },
     {
         name: "Berri-UQAM",
-        line: "Métro — Ligne verte",
-        aliases: ["berri uqam", "berri", "uqam", "berri-uqam"]
+        line: "Métro — Lignes verte / orange / jaune",
+        aliases: ["berri uqam", "berri-uqam"]
     },
     {
         name: "Beaudry",
@@ -944,7 +943,10 @@ const stations = [
 
 let recognition = null;
 let listening = false;
-let selectedStations = [];
+let selectedStationIds = [];
+let audioContext = null;
+const excludedAliases = new Set(["berri","uqam","lionel","parc","sources","quartier","montpetit","mont royal","sainte catherine","saint henri","vanier","lucien","bourassa","longueuil","universite de sherbrooke","fairview","pointe claire","pierrefonds","roxboro","bigras","dorothee","trudeau","griffintown","bernard landry","yul"]);
+const getStationId = station => station.name + "::" + station.line;
 
 let soundEnabled = true;
 let vibrationEnabled = true;
@@ -978,10 +980,9 @@ const autoRestartToggle = document.getElementById("autoRestartToggle");
    ========================================================= */
 
 try {
-    selectedStations =
-        JSON.parse(localStorage.getItem("selectedStationsV2")) || [];
+    selectedStationIds = JSON.parse(localStorage.getItem("selectedStationIdsV3")) || [];
 } catch (e) {
-    selectedStations = [];
+    selectedStationIds = [];
 }
 
 soundEnabled =
@@ -1003,71 +1004,21 @@ autoRestartToggle.checked = autoRestart;
    ========================================================= */
 
 function renderStations() {
-
     stationListElement.innerHTML = "";
-
-    stations.forEach((station, index) => {
-
-        const div = document.createElement("div");
-        div.className = "station";
-
-        const checkbox = document.createElement("input");
-
-        checkbox.type = "checkbox";
-
-        checkbox.checked =
-            selectedStations.includes(index);
-
-        checkbox.addEventListener("change", function() {
-
-            if (this.checked) {
-
-                if (!selectedStations.includes(index)) {
-                    selectedStations.push(index);
-                }
-
-            } else {
-
-                selectedStations =
-                    selectedStations.filter(i => i !== index);
-
-            }
-
-            localStorage.setItem(
-                "selectedStationsV2",
-                JSON.stringify(selectedStations)
-            );
-
-            updateStationCount();
-        });
-
-        const text = document.createElement("div");
-
-        text.innerHTML = `
-            <div class="station-name">
-                ${station.name}
-            </div>
-            <span class="station-line">
-                ${station.line}
-            </span>
-        `;
-
-        div.appendChild(checkbox);
-        div.appendChild(text);
-
-        stationListElement.appendChild(div);
-    });
-
-    updateStationCount();
+    stations.forEach((station) => {
+        const id=getStationId(station), div=document.createElement("div"), checkbox=document.createElement("input"), text=document.createElement("label"), name=document.createElement("div"), line=document.createElement("span");
+        div.className="station"; checkbox.type="checkbox"; checkbox.id="station-"+id; checkbox.checked=selectedStationIds.includes(id); checkbox.setAttribute("aria-label","Être averti à la station "+station.name);
+        checkbox.addEventListener("change",function(){ selectedStationIds=this.checked?[...new Set([...selectedStationIds,id])]:selectedStationIds.filter(value=>value!==id); localStorage.setItem("selectedStationIdsV3",JSON.stringify(selectedStationIds)); updateStationCount(); });
+        text.htmlFor=checkbox.id; name.className="station-name"; name.textContent=station.name; line.className="station-line"; line.textContent=station.line; text.append(name,line); div.append(checkbox,text); stationListElement.appendChild(div);
+    }); updateStationCount();
 }
-
 
 function updateStationCount() {
 
     stationCountElement.textContent =
-        selectedStations.length +
+        selectedStationIds.length +
         " station" +
-        (selectedStations.length > 1 ? "s" : "") +
+        (selectedStationIds.length > 1 ? "s" : "") +
         " sélectionnée" +
         (selectedStations.length > 1 ? "s" : "");
 }
@@ -1139,46 +1090,7 @@ function setupRecognition() {
 
 
     recognition.onresult = function(event) {
-
-        let alternatives = [];
-
-        for (
-            let i = event.resultIndex;
-            i < event.results.length;
-            i++
-        ) {
-
-            const result = event.results[i];
-
-            for (
-                let j = 0;
-                j < result.length;
-                j++
-            ) {
-
-                if (result[j].transcript) {
-
-                    alternatives.push(
-                        result[j].transcript
-                    );
-                }
-            }
-        }
-
-        if (alternatives.length === 0) {
-            return;
-        }
-
-        const displayText =
-            alternatives[0];
-
-        recognizedElement.textContent =
-            displayText;
-
-        for (const transcript of alternatives) {
-
-            detectStation(transcript);
-        }
+        for (let i=event.resultIndex;i<event.results.length;i++) { const result=event.results[i]; if (!result.isFinal || !result[0]?.transcript) continue; const transcript=result[0].transcript; recognizedElement.textContent=transcript; detectStation(transcript); }
     };
 
 
@@ -1252,73 +1164,10 @@ function setupRecognition() {
    DÉTECTION DES STATIONS
    ========================================================= */
 
+function escapeRegExp(text) { return text.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"); }
 function detectStation(originalText) {
-
-    const text =
-        normalizeText(originalText);
-
-    if (!text) {
-        return;
-    }
-
-    for (const index of selectedStations) {
-
-        const station =
-            stations[index];
-
-        if (!station) {
-            continue;
-        }
-
-        const variants = [
-            station.name,
-            ...(station.aliases || [])
-        ];
-
-        for (const variant of variants) {
-
-            const normalizedVariant =
-                normalizeText(variant);
-
-            if (!normalizedVariant) {
-                continue;
-            }
-
-
-            /* Correspondance directe */
-
-            if (
-                text.includes(
-                    normalizedVariant
-                )
-            ) {
-
-                triggerStation(station);
-
-                return;
-            }
-
-
-            /* Correspondance mot par mot */
-
-            const words =
-                normalizedVariant
-                    .split(" ")
-                    .filter(Boolean);
-
-            if (
-                words.length > 1 &&
-                words.every(word =>
-                    text.includes(word)
-                )
-            ) {
-
-                triggerStation(station);
-
-                return;
-            }
-        }
-    }
+    const text=normalizeText(originalText); if (!text || !text.includes("prochaine station")) return;
+    for (const id of selectedStationIds) { const station=stations.find(item=>getStationId(item)===id); if (!station) continue; for (const variant of [station.name,...(station.aliases||[])]) { const target=normalizeText(variant); if (target!==normalizeText(station.name)&&excludedAliases.has(target)) continue; if (new RegExp("(?:^|\\s)prochaine\\s+station(?:\\s+est)?\\s+"+escapeRegExp(target)+"(?:\\s|$)").test(text)) { triggerStation(station); return; } } }
 }
 
 
@@ -1442,6 +1291,11 @@ function closeAlert() {
 
     alarmInterval = null;
 
+    if (audioContext && audioContext.state !== "closed") {
+        audioContext.close().catch(() => {});
+        audioContext = null;
+    }
+
     if (navigator.vibrate) {
         navigator.vibrate(0);
     }
@@ -1464,8 +1318,12 @@ function playAlarm() {
             return;
         }
 
-        const audioContext =
-            new AudioContext();
+        if (!audioContext || audioContext.state === "closed") {
+            audioContext = new AudioContext();
+        }
+        if (audioContext.state === "suspended") {
+            audioContext.resume();
+        }
 
         const oscillator =
             audioContext.createOscillator();
