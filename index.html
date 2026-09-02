@@ -432,6 +432,12 @@ button:disabled {
 
 const stations = [
 
+    {
+        name: "Alexandre Brassard",
+        line: "Alerte personnalisée",
+        aliases: []
+    },
+
     /* =========================
        MÉTRO — LIGNE VERTE
        ========================= */
@@ -1187,7 +1193,28 @@ function setupRecognition() {
 
 
     recognition.onresult = function(event) {
-        for (let i=event.resultIndex;i<event.results.length;i++) { const result=event.results[i]; if (!result.isFinal || !result[0]?.transcript) continue; const transcript=result[0].transcript; recognizedElement.textContent=transcript; detectStation(transcript); }
+
+        let latestTranscript = "";
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const result = event.results[i];
+
+            if (!result[0]?.transcript) {
+                continue;
+            }
+
+            latestTranscript = result[0].transcript;
+
+            /* L'interface montre ce qui est entendu immédiatement,
+               mais seule une phrase finalisée peut déclencher l'alerte. */
+            if (result.isFinal) {
+                detectStation(latestTranscript);
+            }
+        }
+
+        if (latestTranscript) {
+            recognizedElement.textContent = latestTranscript;
+        }
     };
 
 
@@ -1263,8 +1290,47 @@ function setupRecognition() {
 
 function escapeRegExp(text) { return text.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"); }
 function detectStation(originalText) {
-    const text=normalizeText(originalText); if (!text || !text.includes("prochaine station")) return;
-    for (const id of selectedStationIds) { const station=stations.find(item=>getStationId(item)===id); if (!station) continue; for (const variant of [station.name,...(station.aliases||[])]) { const target=normalizeText(variant); if (target!==normalizeText(station.name)&&excludedAliases.has(target)) continue; if (new RegExp("(?:^|\\s)prochaine\\s+station(?:\\s+est)?\\s+"+escapeRegExp(target)+"(?:\\s|$)").test(text)) { triggerStation(station); return; } } }
+    const text = normalizeText(originalText);
+    if (!text) return;
+
+    for (const id of selectedStationIds) {
+        const station = stations.find(item => getStationId(item) === id);
+        if (!station) continue;
+
+        /* L'alerte personnelle correspond au nom complet, sans exiger
+           l'annonce « prochaine station ». */
+        if (station.line === "Alerte personnalisée") {
+            const personalName = escapeRegExp(normalizeText(station.name));
+            if (new RegExp("(?:^|\\s)" + personalName + "(?:\\s|$)").test(text)) {
+                triggerStation(station);
+                return;
+            }
+            continue;
+        }
+
+        if (!text.includes("prochaine station")) continue;
+
+        for (const variant of [station.name, ...(station.aliases || [])]) {
+            const target = normalizeText(variant);
+            if (
+                target !== normalizeText(station.name) &&
+                excludedAliases.has(target)
+            ) {
+                continue;
+            }
+
+            const pattern = new RegExp(
+                "(?:^|\\s)prochaine\\s+station(?:\\s+est)?\\s+" +
+                escapeRegExp(target) +
+                "(?:\\s|$)"
+            );
+
+            if (pattern.test(text)) {
+                triggerStation(station);
+                return;
+            }
+        }
+    }
 }
 
 
