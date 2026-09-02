@@ -124,6 +124,32 @@ button:disabled {
     -webkit-overflow-scrolling: touch;
 }
 
+.station-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.station-actions button {
+    flex: 1;
+    font-size: 14px;
+    padding: 11px 8px;
+    margin: 0;
+    background: #286cff;
+    color: white;
+}
+
+#stationSearch {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #555;
+    border-radius: 12px;
+    background: #111216;
+    color: white;
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
 .station {
     display: flex;
     align-items: center;
@@ -314,6 +340,13 @@ button:disabled {
 
     <div class="card">
         <h2>📍 Mes stations</h2>
+
+        <div class="station-actions">
+            <button id="selectAllButton" type="button">Tout sélectionner</button>
+            <button id="clearAllButton" type="button">Tout désélectionner</button>
+        </div>
+
+        <input id="stationSearch" type="search" placeholder="Rechercher une station ou une ligne" autocomplete="off" aria-label="Rechercher une station ou une ligne">
 
         <div id="stationCount" class="count"></div>
 
@@ -945,6 +978,7 @@ let recognition = null;
 let listening = false;
 let selectedStationIds = [];
 let audioContext = null;
+let stationSearchQuery = "";
 const excludedAliases = new Set(["berri","uqam","lionel","parc","sources","quartier","montpetit","mont royal","sainte catherine","saint henri","vanier","lucien","bourassa","longueuil","universite de sherbrooke","fairview","pointe claire","pierrefonds","roxboro","bigras","dorothee","trudeau","griffintown","bernard landry","yul"]);
 const getStationId = station => station.name + "::" + station.line;
 
@@ -966,6 +1000,9 @@ const statusElement = document.getElementById("status");
 const recognizedElement = document.getElementById("recognized");
 const stationListElement = document.getElementById("stationList");
 const stationCountElement = document.getElementById("stationCount");
+const stationSearch = document.getElementById("stationSearch");
+const selectAllButton = document.getElementById("selectAllButton");
+const clearAllButton = document.getElementById("clearAllButton");
 
 const startButton = document.getElementById("startButton");
 const stopButton = document.getElementById("stopButton");
@@ -1023,14 +1060,54 @@ autoRestartToggle.checked = autoRestart;
    AFFICHAGE DES STATIONS
    ========================================================= */
 
+function saveSelectedStationIds() {
+    localStorage.setItem(
+        "selectedStationIdsV3",
+        JSON.stringify(selectedStationIds)
+    );
+}
+
 function renderStations() {
     stationListElement.innerHTML = "";
-    stations.forEach((station) => {
-        const id=getStationId(station), div=document.createElement("div"), checkbox=document.createElement("input"), text=document.createElement("label"), name=document.createElement("div"), line=document.createElement("span");
-        div.className="station"; checkbox.type="checkbox"; checkbox.id="station-"+id; checkbox.checked=selectedStationIds.includes(id); checkbox.setAttribute("aria-label","Être averti à la station "+station.name);
-        checkbox.addEventListener("change",function(){ selectedStationIds=this.checked?[...new Set([...selectedStationIds,id])]:selectedStationIds.filter(value=>value!==id); localStorage.setItem("selectedStationIdsV3",JSON.stringify(selectedStationIds)); updateStationCount(); });
-        text.htmlFor=checkbox.id; name.className="station-name"; name.textContent=station.name; line.className="station-line"; line.textContent=station.line; text.append(name,line); div.append(checkbox,text); stationListElement.appendChild(div);
-    }); updateStationCount();
+
+    const query = normalizeText(stationSearchQuery);
+    const visibleStations = stations.filter(station =>
+        !query || normalizeText(station.name + " " + station.line)
+            .includes(query)
+    );
+
+    visibleStations.forEach((station) => {
+        const id = getStationId(station);
+        const div = document.createElement("div");
+        const checkbox = document.createElement("input");
+        const text = document.createElement("label");
+        const name = document.createElement("div");
+        const line = document.createElement("span");
+
+        div.className = "station";
+        checkbox.type = "checkbox";
+        checkbox.id = "station-" + id;
+        checkbox.checked = selectedStationIds.includes(id);
+        checkbox.setAttribute("aria-label", "Être averti à la station " + station.name);
+        checkbox.addEventListener("change", function() {
+            selectedStationIds = this.checked
+                ? [...new Set([...selectedStationIds, id])]
+                : selectedStationIds.filter(value => value !== id);
+            saveSelectedStationIds();
+            updateStationCount();
+        });
+
+        text.htmlFor = checkbox.id;
+        name.className = "station-name";
+        name.textContent = station.name;
+        line.className = "station-line";
+        line.textContent = station.line;
+        text.append(name, line);
+        div.append(checkbox, text);
+        stationListElement.appendChild(div);
+    });
+
+    updateStationCount();
 }
 
 function updateStationCount() {
@@ -1040,7 +1117,7 @@ function updateStationCount() {
         " station" +
         (selectedStationIds.length > 1 ? "s" : "") +
         " sélectionnée" +
-        (selectedStations.length > 1 ? "s" : "");
+        (selectedStationIds.length > 1 ? "s" : "");
 }
 
 
@@ -1414,7 +1491,7 @@ function startListening() {
         }
     }
 
-    if (selectedStations.length === 0) {
+    if (selectedStationIds.length === 0) {
 
         alert(
             "Sélectionnez au moins une station avant de démarrer l'écoute."
@@ -1550,6 +1627,23 @@ stopButton.addEventListener(
 /* =========================================================
    INITIALISATION
    ========================================================= */
+
+stationSearch.addEventListener("input", function() {
+    stationSearchQuery = this.value;
+    renderStations();
+});
+
+selectAllButton.addEventListener("click", function() {
+    selectedStationIds = stations.map(getStationId);
+    saveSelectedStationIds();
+    renderStations();
+});
+
+clearAllButton.addEventListener("click", function() {
+    selectedStationIds = [];
+    saveSelectedStationIds();
+    renderStations();
+});
 
 renderStations();
 
