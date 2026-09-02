@@ -985,6 +985,26 @@ try {
     selectedStationIds = [];
 }
 
+/* Migration unique des anciennes sélections mémorisées par position. */
+if (selectedStationIds.length === 0) {
+    try {
+        const legacyIndexes =
+            JSON.parse(localStorage.getItem("selectedStationsV2")) || [];
+        if (Array.isArray(legacyIndexes)) {
+            selectedStationIds = legacyIndexes
+                .map(index => stations[index])
+                .filter(Boolean)
+                .map(getStationId);
+            localStorage.setItem(
+                "selectedStationIdsV3",
+                JSON.stringify(selectedStationIds)
+            );
+        }
+    } catch (e) {
+        selectedStationIds = [];
+    }
+}
+
 soundEnabled =
     localStorage.getItem("soundEnabledV2") !== "false";
 
